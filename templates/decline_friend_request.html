@@ -1,0 +1,52 @@
+<script>
+    function declineFriendRequest(id, friend_request_id,uiUpdateFunction) {
+        payload = {
+            "csrfmiddlewaretoken" : "{{csrf_token}}",
+            "user_id" : id,
+            "friend_request_id": friend_request_id,
+
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            timeout: 5000,
+            url : "{% url 'friend:friend-request-decline' %}",
+            data: payload,
+            success:function(data){
+                
+            },
+            error:function(data){
+                alert(data)
+            },
+           complete: function(data){
+                uiUpdateFunction()
+            }
+        })
+    }
+    function cancelFriendRequest(id, friend_request_id,uiUpdateFunction) {
+        payload = {
+            "csrfmiddlewaretoken" : "{{csrf_token}}",
+            "user_id" : id,
+            "friend_request_id": friend_request_id,
+            
+
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            timeout: 5000,
+            url : "{% url 'friend:friend-request-cancel' %}",
+            data: payload,
+            success:function(data){
+                
+            },
+            error:function(data){
+                alert(data)
+            },
+           complete: function(data){
+                uiUpdateFunction()
+            }
+        })
+    }
+    
+</script>

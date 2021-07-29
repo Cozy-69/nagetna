@@ -1,0 +1,30 @@
+{% extends "base.html"%}
+{%block title%}
+Results for 
+{%endblock title%}
+
+{%block content%}
+    {% if accounts %}
+        {% for account in accounts %}
+            <div class="card mx-auto" style="width: 18rem;">
+                <img src="{{account.profile_image.url}}" class="card-img-top">
+                <div class="card-body">
+                <h4 class="card-title">{{account.username}}</h4>
+                {% if account.bio %}
+                <p class="card-text">{{account.bio}}</p>
+                {% endif %}
+                
+                </div>
+                <div class="card-body">
+                <a href="{% url 'users:account' pk=account.id %}" class="card-link btn btn-outline-primary">Vist Profile</a>
+            </div>
+        </div>
+        <br>
+      {% endfor %}
+    {% else %}
+        <div class="alert alert-warning" role="alert">
+            No accounts were found.
+        </div>
+    {% endif %}
+
+{%endblock content%}

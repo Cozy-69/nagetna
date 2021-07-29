@@ -1,0 +1,123 @@
+{% extends "base.html"%}
+
+{%block title%}
+Home
+{%endblock title%}
+
+{%block content%}
+{% if user.is_authenticated %}
+<form method="POST">
+    {% csrf_token %}
+    <h1>Create Post</h1>
+    <div class="mb-3">
+      <input type="text" class="form-control" name="title" placeholder="Title" maxlength="255">
+    </div>
+        <textarea class="form-control" placeholder="Express your self" name="content"></textarea>
+        <br>
+    <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+  <hr>
+  {% if posts %}
+  {% for post in posts %}
+  <div class="card mx-auto" style="width: 50;">
+    <div class="card-body">
+
+        <img src="{{post.0.creator.profile_image.url}}"  height="50" width="50" class="border rounded-circle">
+        <a class="col" style="text-decoration: none;" href="{% url 'users:account' pk=post.0.creator.id %}">{{post.0.creator.username}}</a>
+
+      <h5 class="card-title">{{post.0.title}}</h5>
+      <h6 class="card-subtitle mb-2 text-muted">Card subtitle</h6>
+      <p class="card-text">{{post.0.content}}</p>
+      <div class="row g-3 align-items-center">
+        <div class="col-auto">
+          <button for="inputPassword6" class="col-form-label  card-link btn btn{% if post.2 %}-{% else %}-outline-{% endif %}danger" onclick="likePost('{{post.0.id}}')"><i class="far fa-heart"></i> {{post.1|length}}</button>
+        </div>
+        <div class="col-auto">
+          <input type="text"  class="form-control" placeholder="Comment" id="comment-id">
+        </div>
+        <a class="col-auto text-danger" style="text-decoration: none;;" href="#" id="comment-submit" onclick="if (document.getElementById('comment-id').value!=null) sendComment('{{post.0.id}}', document.getElementById('comment-id').value);document.getElementById('comment-id').value=''";>
+            <i class="fa fa-paper-plane" aria-hidden="true"></i>
+            
+        </a>
+        <div class="col-auto text-danger" style="text-decoration: none;;" href="#">
+          <a href="{% url 'posts:post_view' pk=post.0.id %}">{{post.3|length}} comments</a>
+          
+      </div>
+      </div>
+
+    </div>
+  </div>
+  <br>
+
+  {% endfor %}
+  {% endif %}
+
+
+
+  <script>
+    function likePost(post_id,) {
+      payload = {
+            "csrfmiddlewaretoken" : "{{csrf_token}}",
+            "post_id" : post_id,
+
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            timeout: 5000,
+            url : "{% url 'posts:like_post' %}",
+            data: payload,
+            success:function(data){
+                
+            },
+            error:function(data){
+                alert(data)
+            },
+           complete: function(data){
+                location.reload()
+            }
+        })
+    }
+    function sendComment(post_id, content) {
+      payload = {
+            "csrfmiddlewaretoken" : "{{csrf_token}}",
+            "post_id" : post_id,
+            "content": content
+
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            timeout: 5000,
+            url : "{% url 'posts:create_comment' %}",
+            data: payload,
+            success:function(data){
+                
+            },
+            error:function(data){
+                alert(data)
+            },
+           complete: function(data){
+                location.reload()
+            }
+        })
+    }
+
+
+  </script>
+
+
+{% else %}
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/new_lander.css' %}">
+<script src="{% static 'js/new_lander.js' %}"></script>
+
+<h1 class="text-center">
+  Where the negus are born.
+</h1>
+<img class="mars" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/62921/mars2-black.jpg" alt="" />
+
+
+
+{% endif %}
+{%endblock content%}

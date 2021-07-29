@@ -1,0 +1,107 @@
+{% extends "base.html"%}
+{% load static %}
+
+{%block title%}
+{{post.title}}
+{%endblock title%}
+
+{%block content%}
+<link rel="stylesheet" href="{% static 'css/post.css' %}">
+<div class="container mt-5">
+    <div class="d-flex justify-content-center row">
+        <div class="col-md-8">
+            <div class="d-flex flex-column comment-section">
+                <div class="bg-white p-2">
+                    <div class="d-flex flex-row user-info"><img class="rounded-circle" src="{{post.creator.profile_image.url}}" width="40">
+                        <div class="d-flex flex-column justify-content-start ml-2"><span class="d-block font-weight-bold name"><a href="{% url 'users:account' pk=post.creator.id %}">{{post.creator.username}}</a></span><span class="date text-black-50">{{post.date_created}}</span></div>
+                    </div>
+                    <div class="mt-2">
+                        <p class="comment-text">{{post.content}}</p>
+                    </div>
+                </div>
+                <div class="bg-white">
+                    <div class="" style="margin-left: 10px;">
+                        <button  id="like-btn" class="like p-2 cursor btn btn{% if my_like %}-danger{% else %}-outline-danger{% endif %}" onclick="likePost('{{post.id}}')"><i class="far fa-heart"></i> <span id="likes-count">{{likes|length}}</span></button>
+                        <br>
+                        <br>
+                    </div>
+                </div>
+                <div class="bg-light p-2">
+                    <div class="d-flex flex-row align-items-start"><img class="rounded-circle" src="{{request.user.profile_image.url}}" width="40"><textarea class="form-control ml-1 shadow-none textarea" placeholder="Write your comment." id="comment-id"></textarea></div>
+                    <div class="mt-2 text-right" style="margin-left: 10px;"><button class="btn btn-primary btn-sm shadow-none" type="button" onclick="if (document.getElementById('comment-id').value!=null) sendComment('{{post.id}}', document.getElementById('comment-id').value)">Post comment</button></div>
+                </div>
+                <div class="bg-light" >
+                    <p style="margin-left: 15px;">{{comments|length}} Comments</p>
+                    <hr>
+                    {% if comments %}
+                    <div class="comment-widgets m-b-20">
+                    {% for comment in comments %}
+                    <div class="d-flex flex-row comment-row">
+                        <div class="p-2 border rounded"><span class="round"><img src="{{comment.user.profile_image.url}}"  width="50"></span></div>
+                        <div class="comment-text w-100">
+                            <h5><a href="{% url 'users:account'   pk=comment.user.id %}">{{comment.user.username}}</a></h5>
+                            <div class="comment-footer"> <span class="date">{{comment.date_created}}</span></div>
+                            <p class="m-b-5 m-t-10">{{comment.content}}</p>
+                        </div>
+                    </div>
+
+                    {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function likePost(post_id) {
+      payload = {
+            "csrfmiddlewaretoken" : "{{csrf_token}}",
+            "post_id" : post_id,
+
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            timeout: 5000,
+            url : "{% url 'posts:like_post' %}",
+            data: payload,
+            success:function(data){
+                
+            },
+            error:function(data){
+                alert(data)
+            },
+           complete: function(data){
+                location.reload()
+                
+            }
+        })
+    }
+    function sendComment(post_id, content) {
+      payload = {
+            "csrfmiddlewaretoken" : "{{csrf_token}}",
+            "post_id" : post_id,
+            "content": content
+
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            timeout: 5000,
+            url : "{% url 'posts:create_comment' %}",
+            data: payload,
+            success:function(data){
+                
+            },
+            error:function(data){
+                alert(data)
+            },
+           complete: function(data){
+                location.reload()
+            }
+        })
+    }
+</script>
+
+{%endblock content%}

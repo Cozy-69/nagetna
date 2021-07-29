@@ -1,0 +1,112 @@
+{% extends "base.html"%}
+{% load static %}
+{%block title%}
+Chatroom
+{%endblock title%}
+
+{%block content%}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+<div class="page-content page-container" id="page-content">
+    <div class="padding">
+        <div class="row container d-flex justify-content-center">
+            <div class="col-md-6">
+                <div class="card card-bordered">
+                    <div class="card-header">
+                        <h4 class="card-title"><strong>{{other_user.username}}</strong></h4>
+                    </div>
+                    <div class="ps-container ps-theme-default ps-active-y" id="chat-content" style="overflow-y: scroll !important; height:400px !important;">
+                        {% if user_messages %}
+                        {% for message in user_messages%}
+                            {% if message.sender == user %}
+                            <div class="media media-chat media-chat-reverse " style="right: 100%;" >
+                                <div class="media-body">
+                                    <div id="my-messages">
+                                        <p class="text-dark">{{message.content}}</p>
+                                    </div>
+                                    
+                                    <p class="meta text-secondary"><time >{{message.date_created}}</time></p>
+                                </div>
+                            </div>
+
+
+                            {% else %}
+                            <div class="media media-chat"> <img class="avatar" src="{{other_user.profile_image.url}}">
+                                <div class="media-body">
+                                    <div id="other-messages">
+                                        <p class="text-dark">{{message.content}}</p>
+                                    </div>
+                                    
+                                    <p class="meta text-secondary"><time >{{message.date_created}}</p>
+                                </div>
+                            </div>
+                            {% endif %}                       
+                        {% endfor %}
+                        {% endif %}
+                        <div class="ps-scrollbar-x-rail" style="left: 0px; bottom: 0px;">
+                            <div class="ps-scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div>
+                        </div>
+                        <div class="ps-scrollbar-y-rail" style="top: 0px; height: 0px; right: 2px;">
+                            <div class="ps-scrollbar-y" tabindex="0" style="top: 0px; height: 2px;"></div>
+                        </div>
+                    </div>
+                    <div class="publisher bt-1 border-light"><input type="text " class="form-control" id="message-input" placeholder="Write message"><button class="btn btn-outline-success btn-sm" onclick="sendMessage('{{other_user.id}}')">Send</button></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    let id = "{{other_user.id}}"
+    console.log(id)
+    var objDiv = document.getElementById("chat-content");
+    objDiv.scrollTop = objDiv.scrollHeight;
+    function sendMessage(id) {
+        let input_val = document.getElementById("message-input").value
+        var url = "{% url 'chat:chatroom-ajax' pk=68516819898124189 %}".replace("68516819898124189", id)
+        payload = {
+            "csrfmiddlewaretoken" : "{{csrf_token}}",
+            "message_contetnt" : input_val,
+            "id": id,
+
+        }
+        $.ajax({
+            type: "POST",
+            dataType: "json",
+            url : url,
+            data: payload,
+            timeout: 5000,
+            success:function(data){
+
+            },
+            error: function(data){
+                console.log(data)
+            },
+            complete:function(data){
+                location.reload()
+                var objDiv = document.getElementById("chat-content");
+                objDiv.scrollTop = objDiv.scrollHeight;
+            }
+        })
+    }
+    function getNewMessages(){
+        var url = "{% url 'chat:chatroom-ajax' pk=68516819898124189 %}".replace("68516819898124189", id)
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url : url,
+            timeout: 5000,
+            success:function(data){
+
+            },
+            error: function(data){
+                console.log(data)
+            },
+            complete:function(data){
+                console.log("complete")
+                console.log(data)
+            }
+        })
+    }
+    setInterval(getNewMessages, 3000)
+</script>
+{%endblock content%}

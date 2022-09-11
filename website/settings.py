@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-i#)mtnvhh#0b!*62qgvifmki=%16%1zk3d37-qh-2*cw@y303k'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 if DEBUG:
     EMAIL_BACKEND = 'djanngo.core.mail.backends.console.EmailBackend'
 ALLOWED_HOSTS = ['nagetna.herokuapp.com', 'localhost', '127.0.0.1']
@@ -92,7 +92,7 @@ WSGI_APPLICATION = 'website.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': 'mydatabase',
     }
 }
 
